@@ -38,8 +38,13 @@ export async function POST(request) {
 
     const spreadsheetId = '1QSv4XVpAdzAfAUztNHSmZ0GH2CGu_-vvvUvsrvcGbHQ'; // ← ここをあなたのIDに置き換え！
 
+    // 日本時間での送信日時を生成
+    const now = new Date();
+    const jstDate = new Date(now.getTime() + 9 * 60 * 60 * 1000);
+    const timestamp = jstDate.toISOString().replace('T', ' ').substring(0, 19);
+
     const row = [
-      new Date().toLocaleString('ja-JP'), // 送信日時
+      timestamp, // JST形式 "YYYY-MM-DD HH:MM:SS"
       userName,
       userKana,
       userPhone,
@@ -55,6 +60,7 @@ export async function POST(request) {
       saturday,
       sunday,
     ];
+
 
     await sheets.spreadsheets.values.append({
       spreadsheetId,
