@@ -26,9 +26,12 @@ export async function POST(request) {
     } = body;
 
     const auth = new google.auth.GoogleAuth({
-      credentials: JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_KEY),
+      credentials: JSON.parse(
+        Buffer.from(process.env.GOOGLE_SERVICE_ACCOUNT_JSON, 'base64').toString('utf8')
+      ),
       scopes: ['https://www.googleapis.com/auth/spreadsheets'],
     });
+    
     
 
     const sheets = google.sheets({ version: 'v4', auth });
