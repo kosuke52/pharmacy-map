@@ -1,0 +1,33 @@
+/* components/MapComponent.module.css */
+
+.mapContainer {
+    position: relative;
+    height: 100vh; /* 親要素が基準 */
+  }
+  
+  /* L.icon を使用する場合、このクラスは直接アイコン画像には適用されません。 */
+  /* 必要に応じて、アイコン画像自体を編集するか、L.divIconに戻すことを検討してください。 */
+  /*
+  .customPharmacyIcon {
+    background-color: transparent;
+    border: none;
+    border-radius: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 64px;
+    height: 64px;
+  }
+  
+  .customPharmacyIcon i {
+    color: #007bff;
+    font-size: 32px;
+  }
+  */
+  
+  .loadingMessage {
+    padding: 10px;
+    text-align: center;
+    font-size: 1.1em;
+    color: #666;
+  }

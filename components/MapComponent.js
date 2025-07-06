@@ -1,238 +1,215 @@
+// components/MapComponent.js
 'use client';
 
-import 'leaflet/dist/leaflet.css';
-import '@fortawesome/fontawesome-free/css/all.min.css';
-import { useState, useEffect, useRef } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
+import L from 'leaflet';
+import { useState, useEffect, useRef } from 'react';
 import { fetchPharmacies } from '../lib/fetchPharmacies';
+import PharmacySlider from './PharmacySlider'; // PharmacySliderをインポート
 
-// ここでカスタムマーカーを作成！
-const customIcon = L.divIcon({
-  html: `
-    <div style="
-      width: 46px;
-      height: 62px;
-      background: #2196f3;
-      clip-path: path('M23 0C10 0 0 10 0 23c0 15 23 39 23 39s23-24 23-39C46 10 36 0 23 0z');
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
-      padding-top: 7px;
-    ">
-      <i class="fas fa-pills" style="color: white; font-size: 20px;"></i>
-    </div>
-  `,
-  className: '',
-  iconSize: [46, 62],
-  iconAnchor: [23, 62],
-  popupAnchor: [0, -62],
+// CSS Modulesをインポート
+import mapStyles from './MapComponent.module.css';
+import infoStyles from './PharmacyInfo.module.css';
+import sliderStyles from './PharmacySlider.module.css';
+
+// customIcon の定義は変更なし（L.icon のまま）
+const customIcon = L.icon({
+  iconUrl: '/images/pharmacy_pin.png',
+  iconSize: [64, 64],
+  iconAnchor: [32, 64],
+  popupAnchor: [0, -64]
 });
 
-export default function MapComponent() {
+export default function MapComponent({ center }) {
   const [pharmacies, setPharmacies] = useState([]);
-  const [center, setCenter] = useState(null); // 初期は null
-
-  const handleInputChange = (index, field, value) => {
-    setPharmacies((prev) => {
-      const newPharmacies = [...prev];
-      newPharmacies[index] = {
-        ...newPharmacies[index],
-        [field]: value,
-      };
-      return newPharmacies;
-    });
-  };
-  
+  // mapHeight はもう不要か、flex: 1 で自動調整される
+  // const [mapHeight, setMapHeight] = useState('500px'); // この行を削除
+  const markerRefs = useRef([]);
 
   useEffect(() => {
-    fetchPharmacies()
-      .then((data) => {
-        console.log('読み込んだ薬局データ:', data);
-        setPharmacies(data);
-      })
-      .catch((err) => console.error('CSV 読み込みエラー:', err));
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          (position) => {
-            const { latitude, longitude } = position.coords;
-            setCenter([latitude, longitude]);
-          },
-          (err) => {
-            console.error('現在地取得エラー:', err);
-            // fallback: 東京駅
-            setCenter([35.681236, 139.767125]);
-          }
-        );
-      } else {
-        setCenter([35.681236, 139.767125]);
-      }
-    }, []);
+    if (!document.querySelector('link[href*="leaflet.css"]')) {
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+      document.head.appendChild(link);
+    }
+  }, []);
 
-    if (!center) {
-        return <div style={{ padding: '1rem', textAlign: 'center' }}>現在地を取得中です...</div>;
-      }
-      
+  useEffect(() => {
+    fetchPharmacies().then(setPharmacies).catch(console.error);
+  }, []);
 
-  const handleRequest = async (pharmacy) => {
-    const { nameInput, kanaInput, phoneInput, ...pharmacyInfo } = pharmacy;
-  
-    const payload = {
-      ...pharmacyInfo,
-      userName: nameInput || '',
-      userKana: kanaInput || '',
-      userPhone: phoneInput || '',
-    };
-  
-    try {
-      const res = await fetch('/api/request', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-  
-      if (res.ok) {
-        alert('依頼を送信しました！');
-      } else {
-        alert('送信に失敗しました。');
-      }
-    } catch (err) {
-      console.error('送信エラー:', err);
-      alert('エラーが発生しました。');
+  // mapHeight の useEffect は削除 (Flexboxが高さを制御するため)
+  // useEffect(() => {
+  //   const update = () => setMapHeight(`${window.innerHeight - 160}px`);
+  //   update();
+  //   window.addEventListener('resize', update);
+  //   return () => window.removeEventListener('resize', update);
+  // }, []);
+
+  const handleSelect = idx => {
+    const ph = pharmacies[idx];
+    const m = markerRefs.current[idx];
+    if (m && m._map) {
+      const map = m._map;
+      map.setView([ph.lat - 0.002, ph.lng], map.getZoom());
+      m.openPopup();
     }
   };
-  
+
+  const handleRequest = async (ph, values) => {
+    const payload = { ...ph, userName: values.name, userKana: values.kana, userPhone: values.phone };
+    const res = await fetch('/api/request', { method: 'POST', headers:{ 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+    alert(res.ok ? 'リクエスト送信済み' : 'エラー発生');
+  };
+
+  if (!center) return <div className={mapStyles.loadingMessage}>現在地取得中…</div>;
 
   return (
-    <>
-      {Array.isArray(center) && center.length === 2 && typeof center[0] === 'number' && typeof center[1] === 'number' && (
-        <MapContainer center={center} zoom={16} style={{ height: '100%', width: '100%' }}>
-          <SearchControl />
-          <TileLayer
-            url="https://api.maptiler.com/maps/streets/{z}/{x}/{y}.png?key=zPn0UsRjVwhwZXQ2Ordt"
-            attribution='&copy; <a href="https://www.maptiler.com/">MapTiler</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          />
+    // MapComponent 自体は Flexbox の子要素として残りの高さを埋める
+    <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+      <MapContainer center={center} zoom={16} zoomControl={false} style={{ height: '100%', width:'100%' }}> {/* ★height を '100%' に変更 */}
+         {/* ★ここに ChangeView コンポーネントを追加 ★ */}
+         <ChangeView center={center} zoom={16} />
+        <TileLayer url={`https://api.maptiler.com/maps/basic/{z}/{x}/{y}.png?key=${process.env.NEXT_PUBLIC_MAPTILER_KEY}`} attribution='&copy; MapTiler &copy; OpenStreetMap contributors'/>
+        {pharmacies.map((ph,i) => ph.lat && ph.lng && (
+          <Marker key={i} position={[ph.lat,ph.lng]} icon={customIcon} ref={el=>markerRefs.current[i]=el}>
+            <Popup>
+              <PharmacyInfo ph={ph} onSubmit={values => handleRequest(ph, values)} />
+            </Popup>
+          </Marker>
+        ))}
+      </MapContainer>
 
-          {pharmacies.map((ph, i) => {
-            if (!ph.lat || !ph.lng) return null;
-            return (
-              <Marker key={i} position={[ph.lat, ph.lng]} icon={customIcon}>
-                <Popup>
-                  <strong>{ph.name}</strong><br />
-                  {ph.address}<br />
-                  TEL: {ph.tel} / FAX: {ph.fax}<br />
-                  <hr />
-                  <div style={{ fontSize: '0.9em' }}>
-                    <div>月: {ph.monday || '休業'}</div>
-                    <div>火: {ph.tuesday || '休業'}</div>
-                    <div>水: {ph.wednesday || '休業'}</div>
-                    <div>木: {ph.thursday || '休業'}</div>
-                    <div>金: {ph.friday || '休業'}</div>
-                    <div>土: {ph.saturday || '休業'}</div>
-                    <div>日: {ph.sunday || '休業'}</div>
-                  </div>
-                  <hr />
-                  <div style={{ fontSize: '0.9em', marginBottom: '4px' }}>
-                    <label>
-                      氏名：
-                      <input
-                        type="text"
-                        placeholder="山田太郎"
-                        value={ph.nameInput || ''}
-                        onChange={(e) => handleInputChange(i, 'nameInput', e.target.value)}
-                        style={{ width: '100%', marginTop: '2px' }}
-                      />
-                    </label>
-                  </div>
-                  <div style={{ fontSize: '0.9em', marginBottom: '4px' }}>
-                    <label>
-                      氏名（ひらがな）：
-                      <input
-                        type="text"
-                        placeholder="やまだたろう"
-                        value={ph.kanaInput || ''}
-                        onChange={(e) => handleInputChange(i, 'kanaInput', e.target.value)}
-                        onBlur={(e) => {
-                          const value = e.target.value;
-                          const hiraganaOnly = value.replace(/[^ぁ-んー\s]/g, '');
-                          if (value !== hiraganaOnly) {
-                            alert('ひらがな以外の文字が含まれていたため、自動修正しました');
-                            handleInputChange(i, 'kanaInput', hiraganaOnly);
-                          }
-                        }}
-                        style={{ width: '100%', marginTop: '2px' }}
-                      />
-                    </label>
-                  </div>
-                  <div style={{ fontSize: '0.9em', marginBottom: '4px' }}>
-                    <label>
-                      携帯番号（11桁）：
-                      <input
-                        type="tel"
-                        maxLength={11}
-                        pattern="\d*"
-                        placeholder="09012345678"
-                        value={ph.phoneInput || ''}
-                        onChange={(e) => handleInputChange(i, 'phoneInput', e.target.value.replace(/\D/g, ''))}
-                        style={{ width: '100%', marginTop: '2px' }}
-                      />
-                    </label>
-                  </div>
-                  <button onClick={() => handleRequest(ph)}>依頼</button>
-                  <hr />
-                </Popup>
-              </Marker>
-            );
-          })}
-        </MapContainer>
-      )}
-    </>
-  );
-} 
-
-
-function SearchControl() {
-  const inputRef = useRef(null);
-  const map = useMap();
-
-  const handleSearch = async () => {
-    const query = inputRef.current.value;
-    if (!query) return;
-  
-    const res = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
-    const results = await res.json();
-  
-    if (results.length > 0) {
-      const { lat, lon } = results[0];
-      map.setView([parseFloat(lat), parseFloat(lon)], 15);
-    } else {
-      alert('場所が見つかりませんでした');
-    }
-  };  
-  const handleLocate = () => {
-    if (!navigator.geolocation) {
-      alert('このブラウザは現在地取得に対応していません');
-      return;
-    }
-
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const { latitude, longitude } = position.coords;
-        map.setView([latitude, longitude], 15);
-      },
-      (error) => {
-        alert('現在地の取得に失敗しました');
-        console.error(error);
-      }
-    );
-};
-
-  return (
-    <div style={{ position: 'absolute', top: 10, left: 10, zIndex: 1000, background: 'white', padding: '5px', borderRadius: '4px' }}>
-      <input type="text" ref={inputRef} placeholder="住所・地名" />
-      <button onClick={handleSearch}>検索</button>
-      <button onClick={handleLocate}>現在地</button>
+      {/* PharmacySlider の position: absolute を削除し、通常のFlexアイテムにする */}
+      <PharmacySlider
+        pharmacies={pharmacies}
+        center={center}
+        onSelect={handleSelect}
+      />
     </div>
   );
 }
+// ★★★ ここから新しいコンポーネントを追加 ★★★
+// 地図のビュー（中心とズーム）を変更するためのヘルパーコンポーネント
+function ChangeView({ center, zoom }) {
+  const map = useMap(); // 現在のMapContainerのインスタンスにアクセス
 
+  useEffect(() => {
+    if (center) {
+      // 地図の中心を新しい座標に設定し、アニメーションで移動
+      map.setView(center, zoom, {
+        animate: true,
+        duration: 0.5, // 0.5秒かけて移動
+      });
+    }
+  }, [center, zoom, map]); // centerまたはzoomが変更されたときに実行
 
+  return null; // このコンポーネントはUIをレンダリングしない
+}
+
+// PharmacyInfo コンポーネント
+function PharmacyInfo({ ph, onSubmit }) {
+  const [vals, setVals] = useState({ name:'', kana:'', phone:'' });
+  const [showForm, setShowForm] = useState(false);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setVals(prev => ({ ...prev, [name]: value }));
+  };
+
+  return (
+    <div className={infoStyles.popupContainer}>
+      <h3 className={infoStyles.pharmacyName}>
+        {ph.name}
+      </h3>
+
+      <div className={infoStyles.contactInfo}>
+        <p style={{ margin: '0 0 5px 0', fontSize: '15px' }}>{ph.address}</p>
+        <p style={{ margin: '0', fontSize: '15px', color: '#555' }}>
+          電話番号：<a href={`tel:${ph.tel}`} className={infoStyles.contactLink}>{ph.tel}</a>
+        </p>
+      </div>
+
+      <div className={infoStyles.businessHoursSection}>
+        <h4 className={infoStyles.businessHoursTitle}>営業時間</h4>
+        <p className={infoStyles.businessHoursNote}>
+          最新の営業時間は、薬局のwebサイトなどでご確認ください。
+        </p>
+        <table className={infoStyles.businessHoursTable}>
+          <tbody>
+            {['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday', 'holiday']
+              .map((d, i) => ph[d] && (
+                <tr key={d} className={infoStyles.tableRow}>
+                  <td className={infoStyles.tableCellDay}>
+                    {['月', '火', '水', '木', '金', '土', '日', '祝'][i]}
+                  </td>
+                  <td className={infoStyles.tableCellTime}>{ph[d]}</td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+
+      {showForm ? (
+        <div className={infoStyles.inputFormContainer}>
+          <label className={infoStyles.inputLabel}>
+            氏名：<input
+              type="text"
+              name="name"
+              placeholder="山田太郎"
+              value={vals.name}
+              onChange={handleChange}
+              className={infoStyles.textInput}
+            />
+          </label>
+          <label className={infoStyles.inputLabel}>
+            氏名（ひらがな）：<input
+              type="text"
+              name="kana"
+              placeholder="やまだたろう"
+              value={vals.kana}
+              onChange={handleChange}
+              className={infoStyles.textInput}
+            />
+          </label>
+          <label className={infoStyles.inputLabel} style={{ marginBottom: '15px' }}>
+            携帯番号：<input
+              type="tel"
+              name="phone"
+              placeholder="09012345678"
+              value={vals.phone}
+              onChange={handleChange}
+              className={infoStyles.textInput}
+            />
+          </label>
+          <button
+            onClick={(e) => { // ★イベントオブジェクトを受け取る
+              e.stopPropagation(); // ★イベントの伝播を停止
+               // ★バリデーションロジックの追加
+               if (!vals.name || !vals.kana || !vals.phone) {
+                alert('氏名、氏名（ひらがな）、携帯番号はすべて入力してください。');
+                return; // 送信を中止
+              }
+              onSubmit(vals);
+            }}
+            className={infoStyles.primaryButton}
+          >
+            依頼する
+          </button> {/* ★ボタンのテキスト変更 */}
+        </div>
+      ) : (
+        <button
+        onClick={(e) => { // ★イベントオブジェクトを受け取る
+          e.stopPropagation(); // ★イベントの伝播を停止
+          setShowForm(true);
+        }}
+        className={infoStyles.primaryButton}
+        >
+          この薬局を選択する
+        </button>
+      )}
+    </div>
+  );
+}

@@ -1,0 +1,102 @@
+/* components/PharmacyInfo.module.css */
+
+.popupContainer {
+    padding: 15px;
+    font-family: sans-serif;
+    font-size: 14px;
+    color: #333;
+    max-width: 300px; /* 画像に合わせてサイズ感を調整 */
+    box-sizing: border-box;
+  }
+  
+  .pharmacyName {
+    margin: 0 0 8px 0;
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 8px;
+  }
+  
+  .contactInfo {
+    margin-bottom: 10px;
+  }
+  
+  .contactLink {
+    color: #007bff;
+    text-decoration: none;
+  }
+  
+  .businessHoursSection {
+    margin-bottom: 15px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 15px;
+  }
+  
+  .businessHoursTitle {
+    margin: 0 0 10px 0;
+    font-size: 16px;
+    color: #333;
+  }
+  
+  .businessHoursNote {
+    margin: 0 0 10px 0;
+    font-size: 13px;
+    color: #777;
+  }
+  
+  .businessHoursTable {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .tableRow {
+    border-bottom: 1px solid #eee;
+  }
+  
+  .tableCellDay {
+    padding: 8px 0;
+    width: 30%;
+    font-weight: bold;
+  }
+  
+  .tableCellTime {
+    padding: 8px 0;
+    width: 70%;
+  }
+  
+  .inputFormContainer {
+    margin-top: 15px;
+    padding-top: 10px;
+    border-top: 1px solid #eee;
+  }
+  
+  .inputLabel {
+    display: block;
+    margin-bottom: 10px;
+  }
+  
+  .textInput {
+    width: calc(100% - 60px); /* ラベルの幅を考慮 */
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+  }
+  
+  .primaryButton {
+    width: 100%;
+    padding: 12px 20px;
+    background-color: #007bff; /* オレンジ色 */
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    transition: background-color 0.2s;
+  }
+  
+  .primaryButton:hover {
+    background-color: #007bff; /* ホバー時の色 */
+  }

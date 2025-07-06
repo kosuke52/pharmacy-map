@@ -1,0 +1,58 @@
+/* components/PharmacySlider.module.css */
+
+.sliderContainer {
+    /*position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;*/
+    z-index: 1000;
+    background: white;
+    overflow-x: auto;
+    /*white-space: nowrap; /* これを削除するとflexboxで折り返される */
+    padding: 10px 0;
+    box-shadow: 0 -2px 6px rgba(0,0,0,0.2);
+    display: flex; /* Flexboxを有効にしてカードを横並びにする */
+    align-items: stretch; /* カードの高さを揃える */
+    flex-wrap: nowrap; /* カードの折り返しを禁止し、横スクロールさせる */
+    justify-content: flex-start; /* カードを左寄せにする */
+    gap: 24px; /* カード間の間隔を統一 (marginの代わりにgapを使用) */
+    padding-left: 12px; /* 左端のパディングを統一 */
+    padding-right: 12px; /* 右端のパディングを統一 */
+    min-height: 180px; /* スライダーの最小高さを設定 (カードの高さ+パディングに合わせて調整) */
+  }
+  
+  .pharmacyCard {
+    flex: 0 0 260px; /* 固定幅 */
+    margin: 0 12px;
+    padding: 28px;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    background: #fff;
+    cursor: pointer;
+    white-space: normal; /* テキストの折り返しを許可 */
+    word-break: break-word; /* 長い単語も改行 */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* 内容が上下に分かれるように */
+    box-sizing: border-box; /* パディングを幅に含める */
+    min-height: 150px; /* カードの最小高さを設定して高さを揃えるのに役立つ */
+  }
+  
+  .cardName {
+    font-weight: bold;
+    margin-bottom: 4px;
+    font-size: 1.1em;
+  }
+  
+  .cardAddress {
+    font-size: 0.85em;
+    color: #555;
+    margin-bottom: 8px;
+  }
+  
+  .cardDistance {
+    font-size: 0.8em;
+    color: #888;
+    text-align: right;
+    margin-top: auto; /* 下部に配置 */
+  }
