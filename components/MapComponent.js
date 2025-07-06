@@ -12,6 +12,8 @@ import mapStyles from './MapComponent.module.css';
 import infoStyles from './PharmacyInfo.module.css';
 import sliderStyles from './PharmacySlider.module.css';
 
+import 'leaflet/dist/leaflet.css';
+
 // customIcon の定義は変更なし（L.icon のまま）
 const customIcon = L.icon({
   iconUrl: '/images/pharmacy_pin.png',
@@ -26,19 +28,27 @@ export default function MapComponent({ center }) {
   // const [mapHeight, setMapHeight] = useState('500px'); // この行を削除
   const markerRefs = useRef([]);
 
-  useEffect(() => {
-    if (!document.querySelector('link[href*="leaflet.css"]')) {
-      const link = document.createElement('link');
-      link.rel = 'stylesheet';
-      link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
-      document.head.appendChild(link);
-    }
-  }, []);
+ // useEffect(() => {
+ //   if (!document.querySelector('link[href*="leaflet.css"]')) {
+ //     const link = document.createElement('link');
+ //     link.rel = 'stylesheet';
+ //     link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+ //     document.head.appendChild(link);
+ //   }
+ // }, []);
 
   useEffect(() => {
     fetchPharmacies().then(setPharmacies).catch(console.error);
   }, []);
-
+  useEffect(() => {
+    const update = () => {
+      // 親コンポーネントが Flexbox で高さを制御するため、この useEffect は不要です
+      // もし、これでレイアウトが崩れる場合は、親のAppRouterのレイアウトを確認する必要があります
+    };
+    // update(); // この行も不要
+    // window.addEventListener('resize', update); // この行も不要
+    // return () => window.removeEventListener('resize', update); // この行も不要
+  }, []);
   // mapHeight の useEffect は削除 (Flexboxが高さを制御するため)
   // useEffect(() => {
   //   const update = () => setMapHeight(`${window.innerHeight - 160}px`);
@@ -134,7 +144,7 @@ function PharmacyInfo({ ph, onSubmit }) {
       <div className={infoStyles.businessHoursSection}>
         <h4 className={infoStyles.businessHoursTitle}>営業時間</h4>
         <p className={infoStyles.businessHoursNote}>
-          最新の営業時間は、薬局のwebサイトなどでご確認ください。
+          営業時間は、薬局のwebサイトなどで必ずご確認ください。
         </p>
         <table className={infoStyles.businessHoursTable}>
           <tbody>
