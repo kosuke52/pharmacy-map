@@ -79,7 +79,10 @@ export default function MapComponent({ center }) {
       <MapContainer center={center} zoom={16} zoomControl={false} style={{ height: '100%', width:'100%' }}> {/* ★height を '100%' に変更 */}
          {/* ★ここに ChangeView コンポーネントを追加 ★ */}
          <ChangeView center={center} zoom={16} />
-        <TileLayer url={`https://api.maptiler.com/maps/basic/{z}/{x}/{y}.png?key=${process.env.NEXT_PUBLIC_MAPTILER_KEY}`} attribution='&copy; MapTiler &copy; OpenStreetMap contributors'/>
+         <TileLayer
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        />
         {pharmacies.map((ph,i) => ph.lat && ph.lng && (
           <Marker key={i} position={[ph.lat,ph.lng]} icon={customIcon} ref={el=>markerRefs.current[i]=el}>
             <Popup>
