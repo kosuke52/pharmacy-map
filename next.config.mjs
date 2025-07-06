@@ -1,13 +1,14 @@
-// 既にある内容に追記 or 上書き
+// next.config.mjs
+
 export default {
-    reactStrictMode: true,
-  
-    webpack(config) {
-      config.module.rules.push({
-        test: /\.css$/i,
-        use: ['style-loader', 'css-loader'],
-      });
-      return config;
-    },
-  };
-  
+  reactStrictMode: true,
+
+  // ★★★ この webpack ブロック全体を削除またはコメントアウト ★★★
+  // webpack(config) {
+  //   config.module.rules.push({
+  //     test: /\.css$/i,
+  //     use: ['style-loader', 'css-loader'],
+  //   });
+  //   return config;
+  // },
+};
