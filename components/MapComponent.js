@@ -12,8 +12,6 @@ import mapStyles from './MapComponent.module.css';
 import infoStyles from './PharmacyInfo.module.css';
 import sliderStyles from './PharmacySlider.module.css';
 
-import 'leaflet/dist/leaflet.css';
-
 // customIcon の定義は変更なし（L.icon のまま）
 const customIcon = L.icon({
   iconUrl: '/images/pharmacy_pin.png',
