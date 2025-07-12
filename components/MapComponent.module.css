@@ -31,3 +31,60 @@
     font-size: 1.1em;
     color: #666;
   }
+  .modalOverlay {
+    position: fixed; /* 画面に固定 */
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.6); /* 半透明の背景 */
+    display: flex;
+    justify-content: center; /* 水平方向中央寄せ */
+    align-items: center; /* 垂直方向中央寄せ */
+    z-index: 2000; /* 地図やスライダーよりも手前に表示 */
+    /* ★追加: 高さを確実に100%にする (念のため) */
+    height: 100vh;
+    width: 100vw;
+  }
+  
+  .modalContent {
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    position: relative;
+    /* SP画面での最大幅と高さの調整 */
+    max-width: 90vw; /* 画面幅の90% */
+    /* ★SP画面対応: 最大高さを画面の約80%に制限し、はみ出たらスクロール */
+    max-height: 80vh; /* ビューポート高さの80%に制限 */
+    overflow-y: auto; /* 内容がはみ出たらスクロール可能に */
+    -webkit-overflow-scrolling: touch; /* iOSでのスクロールをスムーズに */
+    padding: 20px; /* 内容のパディング */
+  
+    /* ★追加: flexアイテムとして振る舞い、中央寄せをサポート */
+    display: flex;
+    flex-direction: column; /* 内容を縦に並べる */
+  }
+  .modalCloseButton {
+    position: absolute;
+    top: 18px; /* 上からの位置 */
+    right: 18px; /* 右からの位置 */
+    background: none;
+    border: none;
+    font-size: 60px; /* ★大きくする */
+    cursor: pointer;
+    color: #09090a; /* ★少し濃い色に変更 */
+    padding: 5px;
+    z-index: 2001;
+    width: 40px; /* ★ボタンのクリック範囲を広げる */
+    height: 40px; /* ★ボタンのクリック範囲を広げる */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%; /* 丸くして見た目を良くする */
+    transition: background-color 0.2s; /* ホバー時のトランジション */
+  }
+  
+  .modalCloseButton:hover {
+    color: #000; /* ホバー時の色 */
+    background-color: #eee; /* ホバー時の背景色 */
+  }

@@ -5,8 +5,19 @@
     font-family: sans-serif;
     font-size: 14px;
     color: #333;
-    max-width: 300px; /* 画像に合わせてサイズ感を調整 */
+    max-width: 90vw; /* 画像に合わせてサイズ感を調整 */
+    width: auto; /* コンテンツに合わせて幅を調整 */
+    /* min-width: 250px; */ /* 最小幅を設定して小さくなりすぎないようにすることも検討 */
     box-sizing: border-box;
+     /* ★SP画面対応: 最大高さを設定し、スクロール可能にする ★ */
+    /*max-height: calc(100vh - 120px); /* 例: ビューポートの高さから120px引いた値 */
+    /* この '120px' は、ページ上部のヘッダー、検索窓、ポップアップの上下の余白などを考慮して調整が必要です。 */
+    /* 例えば、上部の固定ヘッダー+検索窓が合計80px、ポップアップの上下に20pxずつのマージンが欲しいなら、80+20+20=120px */
+    /*overflow-y: auto; /* 縦方向にスクロール可能にする */
+    /*-webkit-overflow-scrolling: touch; /* iOSでのスクロールをスムーズに */
+    border-radius: 8px; /* 角丸はそのまま維持 */
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2); /* 影も維持 */
+    background-color: white; /* 背景色も維持 */
   }
   
   .pharmacyName {
@@ -73,8 +84,22 @@
   
   .inputLabel {
     display: block;
-    margin-bottom: 10px;
-  }
+    margin-bottom: 15px; /* 各入力フィールド間の下マージン */
+    font-weight: bold; /* ラベルの文字を太くする */
+    font-size: 1.05em; /* ラベルの文字サイズ */
+    color: #333; /* ラベルの色 */
+    }
+
+    .inputLabel input {
+        display: block; /* インプットもブロック要素にして、ラベルの下に改行して表示 */
+        width: 100%; /* 親要素の幅いっぱいに広げる */
+        padding: 10px 12px; /* パディングを調整 */
+        margin-top: 8px; /* ラベルとインプットの間のスペース */
+        border: 1px solid #ddd;
+        border-radius: 6px; /* 角丸を少し大きく */
+        box-sizing: border-box; /* パディングを幅に含める */
+        font-size: 1em;
+      }
   
   .textInput {
     width: calc(100% - 60px); /* ラベルの幅を考慮 */
@@ -99,4 +124,51 @@
   
   .primaryButton:hover {
     background-color: #007bff; /* ホバー時の色 */
+  }
+  /* components/MapComponent.module.css */
+
+/* ...既存のスタイル... */
+
+/* ★★★ モーダル用のスタイルを追加 ★★★ */
+.modalOverlay {
+    position: fixed; /* 画面に固定 */
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.6); /* 半透明の背景 */
+    display: flex;
+    justify-content: center;
+    align-items: center; /* 垂直方向中央寄せ */
+    z-index: 2000; /* 地図やスライダーよりも手前に表示 */
+  }
+  
+  .modalContent {
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    position: relative;
+    /* SP画面での最大幅と高さの調整 */
+    max-width: 90vw; /* 画面幅の90% */
+    max-height: 90vh; /* 画面高さの90% */
+    overflow-y: auto; /* 内容がはみ出たらスクロール可能に */
+    -webkit-overflow-scrolling: touch; /* iOSでのスクロールをスムーズに */
+    padding: 20px; /* 内容のパディング */
+  }
+  
+  .modalCloseButton {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #888;
+    padding: 5px;
+    z-index: 2001; /* 閉じるボタンが内容より手前に来るように */
+  }
+  
+  .modalCloseButton:hover {
+    color: #333;
   }

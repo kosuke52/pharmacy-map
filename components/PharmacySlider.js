@@ -1,10 +1,11 @@
 // components/PharmacySlider.js
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import sliderStyles from './PharmacySlider.module.css'; // ★CSSモジュールをインポート
 
 export default function PharmacySlider({ pharmacies, center, onSelect }) {
   const [nearby, setNearby] = useState([]);
+  const sliderRef = useRef(null);
 
   useEffect(() => {
     if (!center || pharmacies.length === 0) return;
@@ -22,12 +23,24 @@ export default function PharmacySlider({ pharmacies, center, onSelect }) {
       .filter(ph => ph.lat && ph.lng)
       .map((ph, i) => ({ ...ph, idx: i, distance: calcDist(ph.lat, ph.lng) }))
       .sort((a,b) => a.distance - b.distance)
-      .slice(0, 10);
+      .slice(0, 20);
     setNearby(sorted);
   }, [center, pharmacies]);
 
+  useEffect(() =>{
+    if (sliderRef.current){
+      sliderRef.current.scrollTo({
+        left: 0,
+        behavior: 'smooth'
+      });
+    }
+  },[nearby]);
+
   return (
-    <div className={sliderStyles.sliderContainer}> {/* ★クラス名を使用 */}
+    <div
+      ref={sliderRef} // ★refをdivに割り当てる
+      className={sliderStyles.sliderContainer} // ★クラス名を使用
+    >
       {nearby.map(ph => (
         <div key={ph.idx}
           onClick={() => onSelect(ph.idx)}
@@ -42,7 +55,7 @@ export default function PharmacySlider({ pharmacies, center, onSelect }) {
               {ph.distance.toFixed(2)} km
             </div>
           )}
-        </div>  
+        </div>
       ))}
     </div>
   );

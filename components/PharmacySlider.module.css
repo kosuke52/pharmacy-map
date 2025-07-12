@@ -1,21 +1,21 @@
 /* components/PharmacySlider.module.css */
 
 .sliderContainer {
-    /*position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;*/
+    /* position: absolute; bottom: 0; left: 0; right: 0; は MapComponent.js の中で直接管理されるため、
+       このCSSモジュールでは直接記述しません。もしもインラインスタイルから移動してきた場合は、
+       MapComponent.js の該当divのstyleプロパティに残っているか確認してください。 */
     z-index: 1000;
     background: white;
     overflow-x: auto;
-    /*white-space: nowrap; /* これを削除するとflexboxで折り返される */
-    padding: 10px 0;
+    /* ★削除: Flexboxとflex-wrap: nowrapが既に横並びを制御するため不要 */
+    /* white-space: nowrap; */
+    padding: 10px 0; /* スライダーコンテナ自体の上下パディング */
     box-shadow: 0 -2px 6px rgba(0,0,0,0.2);
     display: flex; /* Flexboxを有効にしてカードを横並びにする */
     align-items: stretch; /* カードの高さを揃える */
     flex-wrap: nowrap; /* カードの折り返しを禁止し、横スクロールさせる */
     justify-content: flex-start; /* カードを左寄せにする */
-    gap: 24px; /* カード間の間隔を統一 (marginの代わりにgapを使用) */
+    gap: 24px; /* ★カード間の間隔を統一 (marginの代わりにgapを使用) */
     padding-left: 12px; /* 左端のパディングを統一 */
     padding-right: 12px; /* 右端のパディングを統一 */
     min-height: 180px; /* スライダーの最小高さを設定 (カードの高さ+パディングに合わせて調整) */
@@ -23,7 +23,8 @@
   
   .pharmacyCard {
     flex: 0 0 260px; /* 固定幅 */
-    margin: 0 12px;
+    /* ★削除: gapで間隔を制御するためmarginは不要 */
+    /* margin: 0 12px; */
     padding: 28px;
     border-radius: 8px;
     box-shadow: 0 1px 3px rgba(0,0,0,0.2);
